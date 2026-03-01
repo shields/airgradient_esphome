@@ -30,12 +30,15 @@ display:
       - id: airgradient_default
         # https://forum.airgradient.com/t/airgradient-one-customized-mallocarray-esphome-display/1328
         lambda: |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
           it.printf(0,19, id(open_sans_9), "CO2");
           it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);
@@ -57,18 +60,21 @@ display:
           it.printf(0, 42, id(open_sans_14), "$friendly_name");
       - id: summary1
         lambda: |-
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 0, id(open_sans_14), "CO2:");
           it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
           it.printf(0, 16, id(open_sans_14), "PM2.5:");
           it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
           it.printf(0, 32, id(open_sans_14), "Temp:");
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 48, id(open_sans_14), "Humidity:");
-          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(0, 48, id(open_sans_14), show_dew ? "Dewpoint:" : "Humidity:");
+          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: summary2
         lambda: |-
           it.printf(0, 0, id(open_sans_14), "CO2:");
@@ -81,10 +87,12 @@ display:
           it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
       - id: huge_no_units
         lambda: |-
+          bool show_f = id(display_in_f).state;
+          float hum_dew = id(display_dewpoint).state ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 0 - 8, id(open_sans_34), TextAlign::TOP_LEFT, "%.0f", id(co2).state);
-          it.printf(it.get_width(), 0 - 8, id(open_sans_34), TextAlign::TOP_RIGHT, "%.0f", id(humidity).state);
+          it.printf(it.get_width(), 0 - 8, id(open_sans_34), TextAlign::TOP_RIGHT, "%.0f", hum_dew);
           it.printf(0, 64 + 8, id(open_sans_34), TextAlign::BOTTOM_LEFT, "%.0f", id(pm_2_5).state);
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state*9/5+32);
           } else {
             it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
@@ -97,14 +105,17 @@ display:
           it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
       - id: air_temp
         lambda: |-
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 13, id(open_sans_14), "Temp");
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 41, id(open_sans_14), "Humid");
-          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(0, 41, id(open_sans_14), show_dew ? "Dew" : "Humid");
+          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: air_voc
         lambda: |-
           it.printf(0, 6, id(open_sans_20), "VOC:");
@@ -113,12 +124,15 @@ display:
           it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
       - id: combo
         lambda: |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f °F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f °C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.printf(0, 16, id(open_sans_14), "%.0f µg/m³", id(pm_2_5).state);
           it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
           it.printf(0, 32, id(open_sans_14), "VOC: %.0f", id(voc).state);

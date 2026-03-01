@@ -37,7 +37,9 @@ esphome:
                   method: POST
   build_path: build/ag-open-air-o-1pst
   platformio_options: {}
+  environment_variables: {}
   includes: []
+  includes_c: []
   libraries: []
   debug_scheduler: false
   areas: []
@@ -46,20 +48,42 @@ esp32:
   board: esp32-c3-devkitm-1
   framework:
     type: esp-idf
-    version: 5.4.2
+    version: 5.5.2
     sdkconfig_options: {}
     log_level: ERROR
     advanced:
       compiler_optimization: SIZE
+      enable_idf_experimental_features: false
       enable_lwip_assert: true
       ignore_efuse_custom_mac: false
+      ignore_efuse_mac_crc: false
       enable_lwip_mdns_queries: true
       enable_lwip_bridge_interface: false
       enable_lwip_tcpip_core_locking: true
       enable_lwip_check_thread_safety: true
+      disable_libc_locks_in_iram: true
+      disable_vfs_support_termios: true
+      disable_vfs_support_select: true
+      disable_vfs_support_dir: true
+      freertos_in_iram: false
+      ringbuf_in_iram: false
+      heap_in_iram: false
+      execute_from_psram: false
+      loop_task_stack_size: 8192
+      enable_ota_rollback: true
+      use_full_certificate_bundle: false
+      include_builtin_idf_components: []
+      disable_debug_stubs: true
+      disable_ocd_aware: true
+      disable_usb_serial_jtag_secondary: true
+      disable_dev_null_vfs: true
+      disable_mbedtls_peer_cert: true
+      disable_mbedtls_pkcs7: true
+      disable_regi2c_in_iram: true
+      disable_fatfs: true
     components: []
-    platform_version: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.21-2/platform-espressif32.zip
-    source: pioarduino/framework-espidf@https://github.com/pioarduino/esp-idf/releases/download/v5.4.2/esp-idf-v5.4.2.zip
+    platform_version: https://github.com/pioarduino/platform-espressif32/releases/download/55.03.37/platform-espressif32.zip
+    source: pioarduino/framework-espidf@https://github.com/pioarduino/esp-idf/releases/download/v5.5.2/esp-idf-v5.5.2.tar.xz
   flash_size: 4MB
   variant: ESP32C3
   cpu_frequency: 160MHZ
@@ -144,7 +168,7 @@ i2c:
     scan: true
 wifi:
   ap:
-    ap_timeout: 1min
+    ap_timeout: 90s
   domain: .local
   reboot_timeout: 15min
   power_save_mode: LIGHT
@@ -153,8 +177,11 @@ wifi:
   enable_rrm: false
   passive_scan: false
   enable_on_boot: true
+  post_connect_roaming: true
+  min_auth_mode: WPA2
   use_address: ag-open-air-o-1pst.local
-captive_portal: {}
+captive_portal:
+  compression: gzip
 sensor:
   - platform: pmsx003
     type: PMS5003T
@@ -515,7 +542,7 @@ interval:
 http_request:
   verify_ssl: false
   watchdog_timeout: 30s
-  useragent: ESPHome/2025.10.5 (https://esphome.io)
+  useragent: ESPHome/2026.2.2 (https://esphome.io)
   follow_redirects: true
   redirect_limit: 3
   timeout: 4500ms
@@ -538,7 +565,6 @@ output:
       drive_strength: 20.0
 api:
   port: 6053
-  password: \033[5m''\033[6m
   reboot_timeout: 15min
   batch_delay: 100ms
   custom_services: false

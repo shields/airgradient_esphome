@@ -1,0 +1,25 @@
+sensor:
+  - platform: template
+    name: "Dewpoint"
+    id: dewpoint
+    device_class: temperature
+    unit_of_measurement: "°C"
+    icon: "mdi:thermometer-water"
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 60s
+    lambda: |-
+      float t = id(temp).state;
+      float rh = id(humidity).state;
+      if (isnan(t) || isnan(rh) || rh <= 0) return NAN;
+      float h = log(rh / 100.0) + ((17.625 * t) / (243.04 + t));
+      return 243.04 * h / (17.625 - h);
+
+switch:
+  - platform: template
+    name: "Display Dewpoint instead of Humidity"
+    id: display_dewpoint
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: True
+    entity_category: config
+    icon: "mdi:thermometer-water"

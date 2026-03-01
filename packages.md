@@ -86,6 +86,14 @@ Enables debug sensor information for the ESP32-C3 chip that is very verbose.
 
 Enables debug sensor information for the ESP8266 (D1 Mini) chip that is very verbose.
 
+## sensor_dewpoint.yaml
+
+Calculates dewpoint temperature from temperature and humidity using the Magnus approximation (Alduchov & Eskridge 1996 coefficients).
+
+Reports dewpoint in °C. When the "Display Dewpoint instead of Humidity" switch is enabled, display pages show dewpoint temperature (in °C or °F matching the temperature display setting) in place of relative humidity.
+
+Requires a temperature and humidity sensor package (sensor_sht40.yaml, sensor_sht30.yaml, etc.).
+
 ## display_sh1106_multi_page.yaml
 
 Display configuration for AG Pro and ONE.  Supports multiple pages that can be rotated through by enabling the switches in the Home Assistant interface
@@ -96,21 +104,27 @@ Consumes more RAM than the single page config.  If having trouble with devices, 
 
 * AirGradient default page
 * Summary pages with larger font
-* Measurement values without units page with huge font: Top line: CO2, Humidity; Bottom line: PM2.5, Temperature
+* Measurement values without units page with huge font: Top line: CO2, Humidity/Dewpoint; Bottom line: PM2.5, Temperature
 * Air quality with only CO2 and PM2.5 values
-* Air temp and humidity
+* Air temp and humidity/dewpoint
 * VOC and NOx values
 * Combo page with multiple sensor values
+
+When the dewpoint toggle (from sensor_dewpoint.yaml) is enabled, humidity values on all pages are replaced with dewpoint temperature.
 
 ## display_sh1106_single_page.yaml
 
 Display configuration for AG Pro and ONE. Displays only a single page based on the default AirGradient look
+
+When the dewpoint toggle (from sensor_dewpoint.yaml) is enabled, humidity is replaced with dewpoint temperature.
 
 Contrast adjustment is available, which can dim the display considerably, but will not fully disable it
 
 ## display_ssd1306.yaml
 
 Display configuration for AG Basic
+
+When the dewpoint toggle (from sensor_dewpoint.yaml) is enabled, the humidity page shows dewpoint temperature instead.
 
 ## led_co2.yaml
 

@@ -37,7 +37,9 @@ esphome:
                   method: POST
   build_path: build/ag-pro
   platformio_options: {}
+  environment_variables: {}
   includes: []
+  includes_c: []
   libraries: []
   debug_scheduler: false
   areas: []
@@ -120,7 +122,7 @@ i2c:
     scan: true
 wifi:
   ap:
-    ap_timeout: 1min
+    ap_timeout: 90s
   domain: .local
   reboot_timeout: 15min
   power_save_mode: NONE
@@ -128,8 +130,11 @@ wifi:
   output_power: 20.0
   passive_scan: false
   enable_on_boot: true
+  post_connect_roaming: true
+  min_auth_mode: WPA
   use_address: ag-pro.local
-captive_portal: {}
+captive_portal:
+  compression: gzip
 sensor:
   - platform: pmsx003
     type: PMSX003
@@ -322,6 +327,23 @@ sensor:
     accuracy_decimals: 2
     device_class: humidity
     state_class: measurement
+  - platform: template
+    name: Dewpoint
+    id: dewpoint
+    device_class: temperature
+    unit_of_measurement: °C
+    icon: mdi:thermometer-water
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 60s
+    lambda: !lambda |-
+      float t = id(temp).state;
+      float rh = id(humidity).state;
+      if (isnan(t) || isnan(rh) || rh <= 0) return NAN;
+      float h = log(rh / 100.0) + ((17.625 * t) / (243.04 + t));
+      return 243.04 * h / (17.625 - h);
+    disabled_by_default: false
+    force_update: false
   - platform: sgp4x
     voc:
       name: VOC Index
@@ -422,6 +444,15 @@ switch:
       then:
         - senseair.abc_disable:
             id: senseair_co2
+    disabled_by_default: false
+    assumed_state: false
+  - platform: template
+    name: Display Dewpoint instead of Humidity
+    id: display_dewpoint
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    entity_category: config
+    icon: mdi:thermometer-water
     disabled_by_default: false
     assumed_state: false
   - platform: template
@@ -531,12 +562,15 @@ display:
     pages:
       - id: airgradient_default
         lambda: !lambda |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
           it.printf(0,19, id(open_sans_9), "CO2");
           it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);
@@ -696,7 +730,7 @@ number:
 http_request:
   timeout: 1s
   verify_ssl: false
-  useragent: ESPHome/2025.10.5 (https://esphome.io)
+  useragent: ESPHome/2026.2.2 (https://esphome.io)
   follow_redirects: true
   redirect_limit: 3
   esp8266_disable_ssl_support: false
@@ -725,9 +759,9 @@ binary_sensor:
         then:
           - logger.log:
               format: Toggling display between C and F
-              args: []
               level: DEBUG
               tag: main
+              args: []
           - switch.toggle:
               id: display_in_f
         invalid_cooldown: 1s
@@ -740,9 +774,9 @@ binary_sensor:
         then:
           - logger.log:
               format: Starting manual CO2 calibration
-              args: []
               level: DEBUG
               tag: main
+              args: []
           - senseair.background_calibration:
               id: senseair_co2
           - delay: 70s
@@ -754,7 +788,6 @@ binary_sensor:
     interrupt_type: ANY
 api:
   port: 6053
-  password: \033[5m''\033[6m
   reboot_timeout: 15min
   batch_delay: 100ms
   custom_services: false

@@ -41,7 +41,9 @@ esphome:
                   method: POST
   build_path: build/ag-one
   platformio_options: {}
+  environment_variables: {}
   includes: []
+  includes_c: []
   libraries: []
   debug_scheduler: false
   areas: []
@@ -50,20 +52,42 @@ esp32:
   board: esp32-c3-devkitm-1
   framework:
     type: esp-idf
-    version: 5.4.2
+    version: 5.5.2
     sdkconfig_options: {}
     log_level: ERROR
     advanced:
       compiler_optimization: SIZE
+      enable_idf_experimental_features: false
       enable_lwip_assert: true
       ignore_efuse_custom_mac: false
+      ignore_efuse_mac_crc: false
       enable_lwip_mdns_queries: true
       enable_lwip_bridge_interface: false
       enable_lwip_tcpip_core_locking: true
       enable_lwip_check_thread_safety: true
+      disable_libc_locks_in_iram: true
+      disable_vfs_support_termios: true
+      disable_vfs_support_select: true
+      disable_vfs_support_dir: true
+      freertos_in_iram: false
+      ringbuf_in_iram: false
+      heap_in_iram: false
+      execute_from_psram: false
+      loop_task_stack_size: 8192
+      enable_ota_rollback: true
+      use_full_certificate_bundle: false
+      include_builtin_idf_components: []
+      disable_debug_stubs: true
+      disable_ocd_aware: true
+      disable_usb_serial_jtag_secondary: true
+      disable_dev_null_vfs: true
+      disable_mbedtls_peer_cert: true
+      disable_mbedtls_pkcs7: true
+      disable_regi2c_in_iram: true
+      disable_fatfs: true
     components: []
-    platform_version: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.21-2/platform-espressif32.zip
-    source: pioarduino/framework-espidf@https://github.com/pioarduino/esp-idf/releases/download/v5.4.2/esp-idf-v5.4.2.zip
+    platform_version: https://github.com/pioarduino/platform-espressif32/releases/download/55.03.37/platform-espressif32.zip
+    source: pioarduino/framework-espidf@https://github.com/pioarduino/esp-idf/releases/download/v5.5.2/esp-idf-v5.5.2.tar.xz
   flash_size: 4MB
   variant: ESP32C3
   cpu_frequency: 160MHZ
@@ -148,7 +172,7 @@ i2c:
     scan: true
 wifi:
   ap:
-    ap_timeout: 1min
+    ap_timeout: 90s
   domain: .local
   reboot_timeout: 15min
   power_save_mode: LIGHT
@@ -157,8 +181,11 @@ wifi:
   enable_rrm: false
   passive_scan: false
   enable_on_boot: true
+  post_connect_roaming: true
+  min_auth_mode: WPA2
   use_address: ag-one.local
-captive_portal: {}
+captive_portal:
+  compression: gzip
 sensor:
   - platform: pmsx003
     type: PMSX003
@@ -351,6 +378,23 @@ sensor:
     accuracy_decimals: 2
     device_class: humidity
     state_class: measurement
+  - platform: template
+    name: Dewpoint
+    id: dewpoint
+    device_class: temperature
+    unit_of_measurement: °C
+    icon: mdi:thermometer-water
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 60s
+    lambda: !lambda |-
+      float t = id(temp).state;
+      float rh = id(humidity).state;
+      if (isnan(t) || isnan(rh) || rh <= 0) return NAN;
+      float h = log(rh / 100.0) + ((17.625 * t) / (243.04 + t));
+      return 243.04 * h / (17.625 - h);
+    disabled_by_default: false
+    force_update: false
   - platform: sgp4x
     voc:
       name: VOC Index
@@ -454,6 +498,15 @@ switch:
     disabled_by_default: false
     assumed_state: false
   - platform: template
+    name: Display Dewpoint instead of Humidity
+    id: display_dewpoint
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    entity_category: config
+    icon: mdi:thermometer-water
+    disabled_by_default: false
+    assumed_state: false
+  - platform: template
     name: Display Temperature in °F
     id: display_in_f
     restore_mode: RESTORE_DEFAULT_ON
@@ -499,7 +552,7 @@ switch:
     disabled_by_default: false
     assumed_state: false
   - platform: template
-    name: Display Temp/Hum Page
+    name: Display Temp⁄Hum Page
     id: display_air_temp_page
     restore_mode: RESTORE_DEFAULT_OFF
     optimistic: true
@@ -628,12 +681,15 @@ display:
     pages:
       - id: airgradient_default
         lambda: !lambda |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
           it.printf(0,19, id(open_sans_9), "CO2");
           it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);
@@ -655,18 +711,21 @@ display:
           it.printf(0, 42, id(open_sans_14), "AG One");
       - id: summary1
         lambda: !lambda |-
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 0, id(open_sans_14), "CO2:");
           it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
           it.printf(0, 16, id(open_sans_14), "PM2.5:");
           it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
           it.printf(0, 32, id(open_sans_14), "Temp:");
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 48, id(open_sans_14), "Humidity:");
-          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(0, 48, id(open_sans_14), show_dew ? "Dewpoint:" : "Humidity:");
+          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: summary2
         lambda: !lambda |-
           it.printf(0, 0, id(open_sans_14), "CO2:");
@@ -679,10 +738,12 @@ display:
           it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
       - id: huge_no_units
         lambda: !lambda |-
+          bool show_f = id(display_in_f).state;
+          float hum_dew = id(display_dewpoint).state ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 0 - 8, id(open_sans_34), TextAlign::TOP_LEFT, "%.0f", id(co2).state);
-          it.printf(it.get_width(), 0 - 8, id(open_sans_34), TextAlign::TOP_RIGHT, "%.0f", id(humidity).state);
+          it.printf(it.get_width(), 0 - 8, id(open_sans_34), TextAlign::TOP_RIGHT, "%.0f", hum_dew);
           it.printf(0, 64 + 8, id(open_sans_34), TextAlign::BOTTOM_LEFT, "%.0f", id(pm_2_5).state);
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state*9/5+32);
           } else {
             it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
@@ -695,14 +756,17 @@ display:
           it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
       - id: air_temp
         lambda: !lambda |-
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
           it.printf(0, 13, id(open_sans_14), "Temp");
-          if (id(display_in_f).state) {
+          if (show_f) {
             it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 41, id(open_sans_14), "Humid");
-          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(0, 41, id(open_sans_14), show_dew ? "Dew" : "Humid");
+          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: air_voc
         lambda: !lambda |-
           it.printf(0, 6, id(open_sans_20), "VOC:");
@@ -711,12 +775,15 @@ display:
           it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
       - id: combo
         lambda: !lambda |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f °F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f °C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.printf(0, 16, id(open_sans_14), "%.0f µg/m³", id(pm_2_5).state);
           it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
           it.printf(0, 32, id(open_sans_14), "VOC: %.0f", id(voc).state);
@@ -1075,7 +1142,18 @@ number:
 light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
-    pin: 10
+    pin:
+      number: 10
+      mode:
+        output: true
+        input: false
+        open_drain: false
+        pullup: false
+        pulldown: false
+      inverted: false
+      ignore_pin_validation_error: false
+      ignore_strapping_warning: false
+      drive_strength: 20.0
     num_leds: 11
     chipset: WS2812
     name: LED Strip
@@ -1094,7 +1172,7 @@ light:
 http_request:
   verify_ssl: false
   watchdog_timeout: 30s
-  useragent: ESPHome/2025.10.5 (https://esphome.io)
+  useragent: ESPHome/2026.2.2 (https://esphome.io)
   follow_redirects: true
   redirect_limit: 3
   timeout: 4500ms
@@ -1142,9 +1220,9 @@ binary_sensor:
         then:
           - logger.log:
               format: Toggling display between C and F
-              tag: main
-              args: []
               level: DEBUG
+              args: []
+              tag: main
           - switch.toggle:
               id: display_in_f
         invalid_cooldown: 1s
@@ -1157,9 +1235,9 @@ binary_sensor:
         then:
           - logger.log:
               format: Starting manual CO2 calibration
-              tag: main
-              args: []
               level: DEBUG
+              args: []
+              tag: main
           - senseair.background_calibration:
               id: senseair_co2
           - delay: 70s
@@ -1171,7 +1249,6 @@ binary_sensor:
     interrupt_type: ANY
 api:
   port: 6053
-  password: \033[5m''\033[6m
   reboot_timeout: 15min
   batch_delay: 100ms
   custom_services: false

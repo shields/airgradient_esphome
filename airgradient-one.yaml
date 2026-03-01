@@ -25,8 +25,9 @@ packages:
   pm_2.5: github://MallocArray/airgradient_esphome/packages/sensor_pms5003.yaml
   co2: github://MallocArray/airgradient_esphome/packages/sensor_s8.yaml
   temp_humidity: github://MallocArray/airgradient_esphome/packages/sensor_sht40.yaml
+  dewpoint: !include packages/sensor_dewpoint.yaml
   tvoc: github://MallocArray/airgradient_esphome/packages/sensor_sgp41.yaml
-  display: github://MallocArray/airgradient_esphome/packages/display_sh1106_multi_page.yaml
+  display: !include packages/display_sh1106_multi_page.yaml
   led: github://MallocArray/airgradient_esphome/packages/led.yaml
   led_co2: github://MallocArray/airgradient_esphome/packages/led_co2.yaml
   airgradient_api: github://MallocArray/airgradient_esphome/packages/airgradient_api_esp32-c3.yaml

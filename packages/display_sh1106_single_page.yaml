@@ -26,12 +26,15 @@ display:
       - id: airgradient_default
         # https://forum.airgradient.com/t/airgradient-one-customized-mallocarray-esphome-display/1328
         lambda: |-
-          if (id(display_in_f).state) {
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          if (show_f) {
             it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9/5+32);
           } else {
             it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f%%", id(humidity).state);
+          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
           it.printf(0,19, id(open_sans_9), "CO2");
           it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);

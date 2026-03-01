@@ -26,8 +26,9 @@ packages:
   co2: github://MallocArray/airgradient_esphome/packages/sensor_s8.yaml
   temp_humidity: github://MallocArray/airgradient_esphome/packages/sensor_sht40.yaml
   # temp_humidity: github://MallocArray/airgradient_esphome/packages/sensor_sht30.yaml
+  dewpoint: !include packages/sensor_dewpoint.yaml
   tvoc: github://MallocArray/airgradient_esphome/packages/sensor_sgp41.yaml
-  display: github://MallocArray/airgradient_esphome/packages/display_sh1106_single_page.yaml
+  display: !include packages/display_sh1106_single_page.yaml
   airgradient_api: github://MallocArray/airgradient_esphome/packages/airgradient_api_d1_mini.yaml
   config_button: github://MallocArray/airgradient_esphome/packages/config_button.yaml
   wifi: github://MallocArray/airgradient_esphome/packages/sensor_wifi.yaml

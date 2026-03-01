@@ -35,7 +35,9 @@ esphome:
                   method: POST
   build_path: build/ag-basic
   platformio_options: {}
+  environment_variables: {}
   includes: []
+  includes_c: []
   libraries: []
   debug_scheduler: false
   areas: []
@@ -118,7 +120,7 @@ i2c:
     scan: true
 wifi:
   ap:
-    ap_timeout: 1min
+    ap_timeout: 90s
   domain: .local
   reboot_timeout: 15min
   power_save_mode: NONE
@@ -126,8 +128,11 @@ wifi:
   output_power: 20.0
   passive_scan: false
   enable_on_boot: true
+  post_connect_roaming: true
+  min_auth_mode: WPA
   use_address: ag-basic.local
-captive_portal: {}
+captive_portal:
+  compression: gzip
 sensor:
   - platform: pmsx003
     type: PMSX003
@@ -313,6 +318,23 @@ sensor:
     accuracy_decimals: 1
     device_class: humidity
     state_class: measurement
+  - platform: template
+    name: Dewpoint
+    id: dewpoint
+    device_class: temperature
+    unit_of_measurement: °C
+    icon: mdi:thermometer-water
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: 60s
+    lambda: !lambda |-
+      float t = id(temp).state;
+      float rh = id(humidity).state;
+      if (isnan(t) || isnan(rh) || rh <= 0) return NAN;
+      float h = log(rh / 100.0) + ((17.625 * t) / (243.04 + t));
+      return 243.04 * h / (17.625 - h);
+    disabled_by_default: false
+    force_update: false
   - platform: wifi_signal
     name: WiFi Signal
     id: wifi_dbm
@@ -374,6 +396,15 @@ switch:
       then:
         - senseair.abc_disable:
             id: senseair_co2
+    disabled_by_default: false
+    assumed_state: false
+  - platform: template
+    name: Display Dewpoint instead of Humidity
+    id: display_dewpoint
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    entity_category: config
+    icon: mdi:thermometer-water
     disabled_by_default: false
     assumed_state: false
   - platform: template
@@ -451,8 +482,11 @@ display:
             }
       - id: display_humidity
         lambda: !lambda |-
-          it.print(0, 0, id(font1), "HUM");
-          it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, "%.0f%%",id(humidity).state);
+          bool show_f = id(display_in_f).state;
+          bool show_dew = id(display_dewpoint).state;
+          float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
+          it.print(0, 0, id(font1), show_dew ? "DEW" : "HUM");
+          it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, show_dew ? "%.0f" : "%.0f%%", hum_dew);
       - id: boot
         lambda: !lambda |-
           it.printf(64, 0, id(font1), TextAlign::TOP_RIGHT, "%s", get_mac_address().substr(6,8).c_str());
@@ -540,13 +574,12 @@ interval:
 http_request:
   timeout: 1s
   verify_ssl: false
-  useragent: ESPHome/2025.10.5 (https://esphome.io)
+  useragent: ESPHome/2026.2.2 (https://esphome.io)
   follow_redirects: true
   redirect_limit: 3
   esp8266_disable_ssl_support: false
 api:
   port: 6053
-  password: \033[5m''\033[6m
   reboot_timeout: 15min
   batch_delay: 100ms
   custom_services: false
