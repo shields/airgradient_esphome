@@ -1,2 +1,4 @@
 secrets.yaml
 desktop.ini
+.esphome/
+.venv/

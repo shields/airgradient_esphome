@@ -1,0 +1,8 @@
+[project]
+name = "airgradient-esphome"
+version = "0.0.0"
+requires-python = ">=3.12"
+dependencies = ["esphome"]
+
+[dependency-groups]
+dev = []
