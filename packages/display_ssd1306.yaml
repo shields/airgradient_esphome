@@ -1,10 +1,7 @@
 
 font:
-  - file:
-      type: gfonts
-      family: Open Sans
-      weight: bold
-    id: font1
+  - file: "fonts/Inter-SemiBold-ss01.ttf"
+    id: inter_22
     size: 22
     glyphs: '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
   #   glyphs: 'cdCOTEHUMFP.°%0123456789 Na'
@@ -20,32 +17,32 @@ display:
     pages:
       - id: display_pm2
         lambda: |-
-          it.print(0, 0, id(font1), "PM2");
-          it.printf(64, 24, id(font1), TextAlign::TOP_RIGHT, "%.0f",id(pm_2_5).state);
+          it.print(0, 0, id(inter_22), "PM2");
+          it.printf(64, 24, id(inter_22), TextAlign::TOP_RIGHT, "%.0f",id(pm_2_5).state);
       - id: display_co2
         lambda: |-
-          it.print(0, 0, id(font1), "CO2");
-          it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, "%.0f",id(co2).state);
+          it.print(0, 0, id(inter_22), "CO2");
+          it.printf(64, 22, id(inter_22), TextAlign::TOP_RIGHT, "%.0f",id(co2).state);
       - id: display_temp
         lambda: |-
           if (id(display_in_f).state) {
-              it.print(0, 0, id(font1), "°F");
-              it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, "%.1f", id(temp).state*9/5+32);
+              it.print(0, 0, id(inter_22), "°F");
+              it.printf(64, 22, id(inter_22), TextAlign::TOP_RIGHT, "%.1f", id(temp).state*9/5+32);
             } else {
-              it.print(0, 0, id(font1), "°C");
-              it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
+              it.print(0, 0, id(inter_22), "°C");
+              it.printf(64, 22, id(inter_22), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
             }
       - id: display_humidity
         lambda: |-
           bool show_f = id(display_in_f).state;
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9/5+32 : id(dewpoint).state) : id(humidity).state;
-          it.print(0, 0, id(font1), show_dew ? "DEW" : "HUM");
-          it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, show_dew ? "%.0f" : "%.0f%%", hum_dew);
+          it.print(0, 0, id(inter_22), show_dew ? "DEW" : "HUM");
+          it.printf(64, 22, id(inter_22), TextAlign::TOP_RIGHT, show_dew ? "%.0f" : "%.0f%%", hum_dew);
       - id: boot
         lambda: |-
-          it.printf(64, 0, id(font1), TextAlign::TOP_RIGHT, "%s", get_mac_address().substr(6,8).c_str());
-          it.printf(64, 22, id(font1), TextAlign::TOP_RIGHT, "%s", get_mac_address().substr(9,11).c_str());
+          it.printf(64, 0, id(inter_22), TextAlign::TOP_RIGHT, "%s", get_mac_address().substr(6,8).c_str());
+          it.printf(64, 22, id(inter_22), TextAlign::TOP_RIGHT, "%s", get_mac_address().substr(9,11).c_str());
     on_page_change:
       - to: boot
         then:

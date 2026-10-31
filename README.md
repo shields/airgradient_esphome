@@ -4,6 +4,33 @@ ESPHome yaml files for AirGradient devices to maintain the research and accuracy
 
 <img src="image/README/1715467068556.png" width=25% height=25%>
 
+## Changes from upstream
+
+This fork of [MallocArray/airgradient_esphome](https://github.com/MallocArray/airgradient_esphome) adds:
+
+- **Dewpoint readings** for the Basic, Pro, and ONE, calculated from temperature
+  and relative humidity. The persistent **Display Dewpoint instead of Humidity**
+  switch replaces humidity on OLED pages and follows the Fahrenheit/Celsius setting.
+- **OLED typography** using ProFont 11 for small labels and units, IBM EGA 8×14
+  for headers and summary text, and Inter SemiBold (600) for readings on the
+  Pro and ONE. Inter uses `ss01` alternate digits and proportional figures.
+  The large-value page uses 28 px text with padding around both rows; the Basic
+  uses Inter at 22 px. Copy the `fonts` directory alongside your main YAML file;
+  see [display font setup](configuration.md#display-font).
+- **Reproducible development tools** using uv and locked Python dependencies.
+  `make lint` checks the lockfile, `make test` validates every main device
+  configuration, and `make fonts` regenerates the bundled font.
+- **Automated maintenance** with CI configuration checks and Renovate dependency
+  updates, including automatic merging of weekly lockfile maintenance.
+
+The Basic, Pro, and ONE configurations include the display and dewpoint packages
+locally. Copy this fork's `packages` and `fonts` directories with your configuration.
+
+The following renderings show the selected fonts with sample readings on the
+multi-page OLED layouts, enlarged 3×:
+
+![ProFont, IBM EGA, and Inter OLED examples](image/README/selected-font-layouts.png)
+
 ## [Installation](/installation.md)
 
 ## [Configuration](/configuration.md)

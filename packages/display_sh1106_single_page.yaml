@@ -1,17 +1,17 @@
 font:
-  - file: "gfonts://Open Sans"
-    id: open_sans_14
-    size: 14
+  - file: "fonts/IBM-EGA-8x14.ttf"
+    id: ibm_ega
+    # The 14-pixel glyphs occupy a 16-pixel bitmap strike.
+    size: 16
     glyphs: '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
-  - file: "gfonts://Open Sans"
-    id: open_sans_9
-    size: 9
+  - file: "fonts/ProFont-11.bdf"
+    id: profont_11
+    size: 11
     glyphs: '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
-  - file: "gfonts://Open Sans"
-    id: open_sans_20
+  - file: "fonts/Inter-SemiBold-ss01.ttf"
+    id: inter_20
     size: 20
     glyphs: '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
-    bpp: 2
 
 
 binary_sensor:
@@ -41,33 +41,33 @@ display:
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
           if (show_f) {
-            it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9.0/5.0+32.0);
+            it.printf(2, 14, id(ibm_ega), TextAlign::BASELINE_LEFT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
+            it.printf(2, 14, id(ibm_ega), TextAlign::BASELINE_LEFT, "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
+          it.printf(126, 14, id(ibm_ega), TextAlign::BASELINE_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
-          it.printf(0,19, id(open_sans_9), "CO2");
-          it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);
-          it.printf(0,52, id(open_sans_9), "ppm");
+          it.printf(2, 27, id(profont_11), TextAlign::BASELINE_LEFT, "CO2");
+          it.printf(2, 48, id(inter_20), TextAlign::BASELINE_LEFT, "%.0f", id(co2).state);
+          it.printf(2, 61, id(profont_11), TextAlign::BASELINE_LEFT, "ppm");
           it.line(50,19,50,64);
-          it.printf(54, 19, id(open_sans_9), "PM2.5");
-          it.printf(54, 27, id(open_sans_20), "%.0f", id(pm_2_5).state);
-          it.printf(54, 52, id(open_sans_9), "µg/m³");
+          it.printf(54, 27, id(profont_11), TextAlign::BASELINE_LEFT, "PM2.5");
+          it.printf(54, 48, id(inter_20), TextAlign::BASELINE_LEFT, "%.0f", id(pm_2_5).state);
+          it.printf(54, 61, id(profont_11), TextAlign::BASELINE_LEFT, "µg/m³");
           it.line(100,19,100,64);
-          it.printf(104,18, id(open_sans_9), "TVOC");
-          it.printf(104,29, id(open_sans_9), "%.0f", id(voc).state);
-          it.printf(104,41, id(open_sans_9), "NOx");
-          it.printf(104,52, id(open_sans_9), "%.0f", id(nox).state);
+          it.printf(102, 26, id(profont_11), TextAlign::BASELINE_LEFT, "TVOC");
+          it.printf(102, 38, id(profont_11), TextAlign::BASELINE_LEFT, "%.0f", id(voc).state);
+          it.printf(102, 49, id(profont_11), TextAlign::BASELINE_LEFT, "NOx");
+          it.printf(102, 61, id(profont_11), TextAlign::BASELINE_LEFT, "%.0f", id(nox).state);
       - id: boot
         lambda: |-
-          it.printf(0, 0, id(open_sans_14), "ID:");
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%s", get_mac_address().c_str());
-          it.printf(0, 21, id(open_sans_14), "Config Ver: $config_version");
-          it.printf(0, 42, id(open_sans_14), "$friendly_name");
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "ID:");
+          it.printf(126, 12, id(profont_11), TextAlign::BASELINE_RIGHT, "%s", get_mac_address().c_str());
+          it.printf(2, 32, id(profont_11), TextAlign::BASELINE_LEFT, "Config Ver: $config_version");
+          it.printf(2, 52, id(profont_11), TextAlign::BASELINE_LEFT, "$friendly_name");
       - id: blank
         lambda: |-
-          it.printf(0, 0, id(open_sans_14), " ");
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, " ");
 
     on_page_change:
       - to: airgradient_default

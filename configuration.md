@@ -23,6 +23,30 @@ network:
     enable_ipv6: true
 ```
 
+### Display font
+
+The Pro and ONE OLED displays use ProFont 11 for small labels and units, IBM EGA
+8×14 for headers and summary text, and Inter SemiBold (weight 600) at 20 and 28 px
+for readings. The Basic uses Inter SemiBold at 22 px. All fonts render at 1 bit
+per pixel.
+
+The bundled Inter font uses `ss01` alternate digits and proportional figures,
+and is derived from
+[Inter 4.1](https://github.com/rsms/inter/releases/tag/v4.1). Its Unicode
+character maps select the `ss01` glyphs because ESPHome rasterizes characters
+without applying OpenType substitutions. Tabular figures (`tnum`) are not enabled.
+
+ProFont's native bitmap comes from the [U8g2 font collection](https://github.com/olikraus/u8g2/blob/ae801fc34a2735fce67345dc7f3ee2aa37100479/tools/font/bdf/profont11.bdf).
+IBM EGA comes from the [Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/).
+Its 14-pixel glyphs occupy a 16-pixel bitmap strike. The micro sign is shifted down
+one pixel to align with adjacent lowercase letters. The font's TrueType container
+uses a `.ttf` extension so ESPHome recognizes it. The upstream license files are
+included in `fonts`.
+
+When copying display packages into an ESPHome installation, also copy the
+`fonts` directory next to the main YAML file. Run `make fonts` to regenerate
+the bundled fonts from their verified upstream sources.
+
 # Modification
 
 ### Using local packages

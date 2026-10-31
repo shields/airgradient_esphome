@@ -41,9 +41,12 @@ In some cases, the device may encounter errors using the web flash tool.  Steps 
 
 ## Full YAML file
 
-The `full_config` folder contains a single yaml file per model that contains the full standalone configuration, created by the `esphome config` command.  This adds in all of the optional parameters, so is much longer than the minimum configuration, but the single file contains all needed information to be completely independent from this repo.
+The `full_config` folder contains a single yaml file per model that contains the full configuration, created by the `esphome config` command. This adds in all of the optional parameters, so is much longer than the minimum configuration.
 
 Copy the full config file to your personal ESPhome config file and customize as desired, then install to your device.
+
+For models with a display, also copy the `fonts` directory next to your personal
+config file and change the font paths from `../fonts/` to `fonts/`.
 
 ## Troubleshooting
 

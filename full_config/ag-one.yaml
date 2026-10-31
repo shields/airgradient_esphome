@@ -603,13 +603,10 @@ switch:
     assumed_state: false
 font:
   - file:
-      family: Open Sans
-      weight: 400
-      italic: false
-      refresh: 1d
-      type: gfonts
-    id: open_sans_14
-    size: 14
+      path: ../fonts/IBM-EGA-8x14.ttf
+      type: local
+    id: ibm_ega
+    size: 16
     glyphs:
       - '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
     glyphsets: []
@@ -617,13 +614,10 @@ font:
     bpp: 1
     extras: []
   - file:
-      family: Open Sans
-      weight: 400
-      italic: false
-      refresh: 1d
-      type: gfonts
-    id: open_sans_9
-    size: 9
+      path: ../fonts/ProFont-11.bdf
+      type: local
+    id: profont_11
+    size: 11
     glyphs:
       - '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
     glyphsets: []
@@ -631,12 +625,9 @@ font:
     bpp: 1
     extras: []
   - file:
-      family: Open Sans
-      weight: 400
-      italic: false
-      refresh: 1d
-      type: gfonts
-    id: open_sans_20
+      path: ../fonts/Inter-SemiBold-ss01.ttf
+      type: local
+    id: inter_20
     size: 20
     glyphs:
       - '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
@@ -645,13 +636,10 @@ font:
     bpp: 1
     extras: []
   - file:
-      family: Open Sans
-      weight: 400
-      italic: false
-      refresh: 1d
-      type: gfonts
-    id: open_sans_34
-    size: 34
+      path: ../fonts/Inter-SemiBold-ss01.ttf
+      type: local
+    id: inter_28
+    size: 28
     glyphs:
       - '!"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/µ³'
     glyphsets: []
@@ -738,113 +726,113 @@ display:
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
           if (show_f) {
-            it.printf(0, 0, id(open_sans_14), "%.1f°F", id(temp).state*9.0/5.0+32.0);
+            it.printf(2, 14, id(ibm_ega), TextAlign::BASELINE_LEFT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(0, 0, id(open_sans_14), "%.1f°C", id(temp).state);
+            it.printf(2, 14, id(ibm_ega), TextAlign::BASELINE_LEFT, "%.1f°C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
+          it.printf(126, 14, id(ibm_ega), TextAlign::BASELINE_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
           it.line(0,17,128,17);
-          it.printf(0,19, id(open_sans_9), "CO2");
-          it.printf(0,27, id(open_sans_20), "%.0f", id(co2).state);
-          it.printf(0,52, id(open_sans_9), "ppm");
+          it.printf(2, 27, id(profont_11), TextAlign::BASELINE_LEFT, "CO2");
+          it.printf(2, 48, id(inter_20), TextAlign::BASELINE_LEFT, "%.0f", id(co2).state);
+          it.printf(2, 61, id(profont_11), TextAlign::BASELINE_LEFT, "ppm");
           it.line(50,19,50,64);
-          it.printf(54, 19, id(open_sans_9), "PM2.5");
-          it.printf(54, 27, id(open_sans_20), "%.0f", id(pm_2_5).state);
-          it.printf(54, 52, id(open_sans_9), "µg/m³");
+          it.printf(54, 27, id(profont_11), TextAlign::BASELINE_LEFT, "PM2.5");
+          it.printf(54, 48, id(inter_20), TextAlign::BASELINE_LEFT, "%.0f", id(pm_2_5).state);
+          it.printf(54, 61, id(profont_11), TextAlign::BASELINE_LEFT, "µg/m³");
           it.line(100,19,100,64);
-          it.printf(104,18, id(open_sans_9), "TVOC");
-          it.printf(104,29, id(open_sans_9), "%.0f", id(voc).state);
-          it.printf(104,41, id(open_sans_9), "NOx");
-          it.printf(104,52, id(open_sans_9), "%.0f", id(nox).state);
+          it.printf(102, 26, id(profont_11), TextAlign::BASELINE_LEFT, "TVOC");
+          it.printf(102, 38, id(profont_11), TextAlign::BASELINE_LEFT, "%.0f", id(voc).state);
+          it.printf(102, 49, id(profont_11), TextAlign::BASELINE_LEFT, "NOx");
+          it.printf(102, 61, id(profont_11), TextAlign::BASELINE_LEFT, "%.0f", id(nox).state);
       - id: boot
         lambda: !lambda |-
-          it.printf(0, 0, id(open_sans_14), "ID:");
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%s", get_mac_address().c_str());
-          it.printf(0, 21, id(open_sans_14), "Config Ver: 5.3.6");
-          it.printf(0, 42, id(open_sans_14), "AG One");
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "ID:");
+          it.printf(126, 12, id(profont_11), TextAlign::BASELINE_RIGHT, "%s", get_mac_address().c_str());
+          it.printf(2, 32, id(profont_11), TextAlign::BASELINE_LEFT, "Config Ver: 5.3.6");
+          it.printf(2, 52, id(profont_11), TextAlign::BASELINE_LEFT, "AG One");
       - id: summary1
         lambda: !lambda |-
           bool show_f = id(display_in_f).state;
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
-          it.printf(0, 0, id(open_sans_14), "CO2:");
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
-          it.printf(0, 16, id(open_sans_14), "PM2.5:");
-          it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
-          it.printf(0, 32, id(open_sans_14), "Temp:");
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "CO2:");
+          it.printf(126, 12, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f ppm", id(co2).state);
+          it.printf(2, 28, id(profont_11), TextAlign::BASELINE_LEFT, "PM2.5:");
+          it.printf(126, 28, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
+          it.printf(2, 44, id(profont_11), TextAlign::BASELINE_LEFT, "Temp:");
           if (show_f) {
-            it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
+            it.printf(126, 44, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
+            it.printf(126, 44, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 48, id(open_sans_14), show_dew ? "Dewpoint:" : "Humidity:");
-          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
+          it.printf(2, 60, id(profont_11), TextAlign::BASELINE_LEFT, show_dew ? "Dewpoint:" : "Humidity:");
+          it.printf(126, 60, id(ibm_ega), TextAlign::BASELINE_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: summary2
         lambda: !lambda |-
-          it.printf(0, 0, id(open_sans_14), "CO2:");
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
-          it.printf(0, 16, id(open_sans_14), "PM2.5:");
-          it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
-          it.printf(0, 32, id(open_sans_14), "VOC:");
-          it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f", id(voc).state);
-          it.printf(0, 48, id(open_sans_14), "NOx:");
-          it.printf(128, 48, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "CO2:");
+          it.printf(126, 12, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f ppm", id(co2).state);
+          it.printf(2, 28, id(profont_11), TextAlign::BASELINE_LEFT, "PM2.5:");
+          it.printf(126, 28, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
+          it.printf(2, 44, id(profont_11), TextAlign::BASELINE_LEFT, "VOC:");
+          it.printf(126, 44, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f", id(voc).state);
+          it.printf(2, 60, id(profont_11), TextAlign::BASELINE_LEFT, "NOx:");
+          it.printf(126, 60, id(ibm_ega), TextAlign::BASELINE_RIGHT, "%.0f", id(nox).state);
       - id: huge_no_units
         lambda: !lambda |-
           bool show_f = id(display_in_f).state;
           float hum_dew = id(display_dewpoint).state ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
-          it.printf(0, 0 - 8, id(open_sans_34), TextAlign::TOP_LEFT, "%.0f", id(co2).state);
-          it.printf(it.get_width(), 0 - 8, id(open_sans_34), TextAlign::TOP_RIGHT, "%.0f", hum_dew);
-          it.printf(0, 64 + 8, id(open_sans_34), TextAlign::BOTTOM_LEFT, "%.0f", id(pm_2_5).state);
+          it.printf(2, 26, id(inter_28), TextAlign::BASELINE_LEFT, "%.0f", id(co2).state);
+          it.printf(it.get_width() - 2, 26, id(inter_28), TextAlign::BASELINE_RIGHT, "%.0f", hum_dew);
+          it.printf(2, 58, id(inter_28), TextAlign::BASELINE_LEFT, "%.0f", id(pm_2_5).state);
           if (show_f) {
-            it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state*9.0/5.0+32.0);
+            it.printf(it.get_width() - 2, 58, id(inter_28), TextAlign::BASELINE_RIGHT, "%.1f", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(it.get_width(), 64 + 8, id(open_sans_34), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
+            it.printf(it.get_width() - 2, 58, id(inter_28), TextAlign::BASELINE_RIGHT, "%.1f", id(temp).state);
           }
       - id: air_quality
         lambda: !lambda |-
-          it.printf(0, 13, id(open_sans_14), "CO2");
-          it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
-          it.printf(0, 41, id(open_sans_14), "PM2");
-          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
+          it.printf(2, 26, id(profont_11), TextAlign::BASELINE_LEFT, "CO2");
+          it.printf(126, 26, id(inter_20), TextAlign::BASELINE_RIGHT, "%.0f ppm", id(co2).state);
+          it.printf(2, 54, id(profont_11), TextAlign::BASELINE_LEFT, "PM2");
+          it.printf(126, 54, id(inter_20), TextAlign::BASELINE_RIGHT, "%.0f µg/m³", id(pm_2_5).state);
       - id: air_temp
         lambda: !lambda |-
           bool show_f = id(display_in_f).state;
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
-          it.printf(0, 13, id(open_sans_14), "Temp");
+          it.printf(2, 26, id(profont_11), TextAlign::BASELINE_LEFT, "Temp");
           if (show_f) {
-            it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
+            it.printf(126, 26, id(inter_20), TextAlign::BASELINE_RIGHT, "%.1f°F", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
+            it.printf(126, 26, id(inter_20), TextAlign::BASELINE_RIGHT, "%.1f°C", id(temp).state);
           }
-          it.printf(0, 41, id(open_sans_14), show_dew ? "Dew" : "Humid");
-          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
+          it.printf(2, 54, id(profont_11), TextAlign::BASELINE_LEFT, show_dew ? "Dew" : "Humid");
+          it.printf(126, 54, id(inter_20), TextAlign::BASELINE_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
       - id: air_voc
         lambda: !lambda |-
-          it.printf(0, 6, id(open_sans_20), "VOC:");
-          it.printf(128, 6, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f", id(voc).state);
-          it.printf(0, 34, id(open_sans_20), "NOx:");
-          it.printf(128, 34, id(open_sans_20), TextAlign::TOP_RIGHT, "%.0f", id(nox).state);
+          it.printf(2, 26, id(profont_11), TextAlign::BASELINE_LEFT, "VOC:");
+          it.printf(126, 26, id(inter_20), TextAlign::BASELINE_RIGHT, "%.0f", id(voc).state);
+          it.printf(2, 54, id(profont_11), TextAlign::BASELINE_LEFT, "NOx:");
+          it.printf(126, 54, id(inter_20), TextAlign::BASELINE_RIGHT, "%.0f", id(nox).state);
       - id: combo
         lambda: !lambda |-
           bool show_f = id(display_in_f).state;
           bool show_dew = id(display_dewpoint).state;
           float hum_dew = show_dew ? (show_f ? id(dewpoint).state*9.0/5.0+32.0 : id(dewpoint).state) : id(humidity).state;
           if (show_f) {
-            it.printf(0, 0, id(open_sans_14), "%.1f °F", id(temp).state*9.0/5.0+32.0);
+            it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "%.1f °F", id(temp).state*9.0/5.0+32.0);
           } else {
-            it.printf(0, 0, id(open_sans_14), "%.1f °C", id(temp).state);
+            it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, "%.1f °C", id(temp).state);
           }
-          it.printf(128, 0, id(open_sans_14), TextAlign::TOP_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
-          it.printf(0, 16, id(open_sans_14), "%.0f µg/m³", id(pm_2_5).state);
-          it.printf(128, 16, id(open_sans_14), TextAlign::TOP_RIGHT, "%.0f ppm", id(co2).state);
-          it.printf(0, 32, id(open_sans_14), "VOC: %.0f", id(voc).state);
-          it.printf(128, 32, id(open_sans_14), TextAlign::TOP_RIGHT, "NOx: %.0f", id(nox).state);
-          it.printf(0, 48, id(open_sans_14), "AQI: %.0f", id(pm_2_5_aqi).state);
+          it.printf(126, 12, id(profont_11), TextAlign::BASELINE_RIGHT, show_dew ? (show_f ? "%.1f°F" : "%.1f°C") : "%.1f%%", hum_dew);
+          it.printf(2, 28, id(profont_11), TextAlign::BASELINE_LEFT, "%.0f µg/m³", id(pm_2_5).state);
+          it.printf(126, 28, id(profont_11), TextAlign::BASELINE_RIGHT, "%.0f ppm", id(co2).state);
+          it.printf(2, 44, id(profont_11), TextAlign::BASELINE_LEFT, "VOC: %.0f", id(voc).state);
+          it.printf(126, 44, id(profont_11), TextAlign::BASELINE_RIGHT, "NOx: %.0f", id(nox).state);
+          it.printf(2, 60, id(profont_11), TextAlign::BASELINE_LEFT, "AQI: %.0f", id(pm_2_5_aqi).state);
       - id: blank
         lambda: !lambda |-
-          it.printf(0, 0, id(open_sans_14), " ");
+          it.printf(2, 12, id(profont_11), TextAlign::BASELINE_LEFT, " ");
     on_page_change:
       - to: airgradient_default
         then:
