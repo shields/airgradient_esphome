@@ -8,3 +8,6 @@ dependencies = ["esphome"]
 dev = [
     "fonttools>=4.68.0",
 ]
+
+[tool.uv]
+exclude-newer = "3 days"
